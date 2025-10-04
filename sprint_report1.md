@@ -1,4 +1,4 @@
-# Sprint x Report
+# Sprint 1 Report
 Video Link:
 ## What's New (User Facing)
 * Users can register a new account and log in with their credentials.
