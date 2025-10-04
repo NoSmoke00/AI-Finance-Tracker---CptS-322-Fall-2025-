@@ -1,5 +1,5 @@
 # Sprint 1 Report
-Video Link:
+Video Link: https://youtu.be/KBIcYqCa1zg?si=DnRzfa-1ZDQNZN4d
 ## What's New (User Facing)
 * Users can register a new account and log in with their credentials.
 * A dashboard page is available after login, showing a placeholder financial overview.
