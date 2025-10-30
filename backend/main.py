@@ -10,6 +10,7 @@ from app.models import Base
 from app.auth.router import router as auth_router
 from app.api.dashboard import router as dashboard_router
 from app.api.plaid_routes import router as plaid_router
+from app.api.transactions import router as transactions_router
 
 # Load environment variables
 load_dotenv()
@@ -40,6 +41,7 @@ security = HTTPBearer()
 app.include_router(auth_router, prefix="/api/auth", tags=["authentication"])
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(plaid_router, prefix="/api/plaid", tags=["plaid"])
+app.include_router(transactions_router, prefix="/api/transactions", tags=["transactions"])
 
 @app.get("/")
 async def root():
