@@ -11,6 +11,9 @@ from app.auth.router import router as auth_router
 from app.api.dashboard import router as dashboard_router
 from app.api.plaid_routes import router as plaid_router
 from app.api.transactions import router as transactions_router
+from app.api.insights import router as insights_router
+from app.tasks.insight_tasks import start_scheduler
+import os
 
 # Load environment variables
 load_dotenv()
@@ -42,6 +45,7 @@ app.include_router(auth_router, prefix="/api/auth", tags=["authentication"])
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(plaid_router, prefix="/api/plaid", tags=["plaid"])
 app.include_router(transactions_router, prefix="/api/transactions", tags=["transactions"])
+app.include_router(insights_router, prefix="/api/insights", tags=["insights"])
 
 @app.get("/")
 async def root():
@@ -53,3 +57,9 @@ async def health_check():
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+# Start scheduler (guard to avoid multiple in dev reloads)
+try:
+    start_scheduler()
+except Exception:
+    pass

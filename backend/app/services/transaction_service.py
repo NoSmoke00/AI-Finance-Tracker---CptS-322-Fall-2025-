@@ -6,6 +6,7 @@ from app.models import PlaidItem, Account, Transaction
 
 from plaid.api import plaid_api
 from plaid.model.transactions_get_request import TransactionsGetRequest
+from plaid.model.transactions_get_request_options import TransactionsGetRequestOptions
 from plaid.model.country_code import CountryCode
 from plaid.configuration import Configuration
 from plaid.api_client import ApiClient
@@ -59,6 +60,9 @@ def sync_transactions_for_user(user_id: int, db: Session) -> Dict[str, int]:
                 access_token=item.access_token,
                 start_date=start_date,
                 end_date=end_date,
+                options=TransactionsGetRequestOptions(
+                    include_personal_finance_category=True
+                ),
             )
             resp = plaid_client.transactions_get(req)
 
@@ -79,6 +83,25 @@ def sync_transactions_for_user(user_id: int, db: Session) -> Dict[str, int]:
                 # Plaid: positive is expense; store expenses as negative
                 amount_to_store = -amount
 
+                # Use Plaid Personal Finance Category when present (simple handling)
+                pfc = tr.get('personal_finance_category')
+                primary_category = None
+                categories = tr.get('category')
+                if isinstance(pfc, dict):
+                    primary_category = pfc.get('primary') or None
+                    detailed = pfc.get('detailed') or None
+                    categories = [c for c in [primary_category, detailed] if c]
+
+                # Coerce categories to clean list[str]
+                if categories is None:
+                    categories = []
+                try:
+                    categories = [str(c) for c in categories if c]
+                except Exception:
+                    categories = []
+                if not primary_category:
+                    primary_category = categories[0] if categories else None
+
                 fields = {
                     'user_id': user_id,
                     'account_id': account.id,
@@ -87,8 +110,8 @@ def sync_transactions_for_user(user_id: int, db: Session) -> Dict[str, int]:
                     'date': tr['date'],
                     'name': tr['name'],
                     'merchant_name': tr.get('merchant_name'),
-                    'category': tr.get('category'),
-                    'primary_category': _extract_primary_category(tr.get('category')),
+                    'category': categories,
+                    'primary_category': primary_category or _extract_primary_category(categories),
                     'pending': tr.get('pending', False),
                 }
 

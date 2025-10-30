@@ -11,6 +11,7 @@ from app.schemas.transaction import (
     TransactionSummaryResponse,
 )
 from app.services.transaction_service import sync_transactions_for_user, get_transaction_summary
+from app.services.insights_service import InsightsAI
 
 
 router = APIRouter()
@@ -54,6 +55,11 @@ def sync_transactions(
     db: Session = Depends(get_db),
 ):
     result = sync_transactions_for_user(current_user.id, db)
+    # trigger insights generation after sync (fire-and-forget best-effort)
+    try:
+        InsightsAI().generate_insights_for_user(current_user.id, db)
+    except Exception:
+        pass
     return {"message": "Sync complete", **result}
 
 

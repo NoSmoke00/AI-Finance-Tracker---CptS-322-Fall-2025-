@@ -11,3 +11,5 @@ python-dotenv==1.0.0
 plaid-python==37.0.0
 pydantic-settings==2.1.0
 email-validator==2.1.0
+groq
+APScheduler==3.10.4
