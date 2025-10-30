@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { dashboardApi, plaidApi } from '@/lib/api';
+import { dashboardApi, transactionsApi, plaidApi } from '@/lib/api';
 import { DashboardSummary, Account, Transaction } from '@/types';
 import AppLayout from '@/components/AppLayout';
 
@@ -10,6 +10,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [accounts, setAccounts] = useState<{ id: number; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -17,13 +18,15 @@ export default function DashboardPage() {
     const loadDashboardData = async () => {
       try {
         setLoading(true);
-        const [summaryData, transactionsData] = await Promise.all([
+        const [summaryData, transactionsData, accountsData] = await Promise.all([
           dashboardApi.getSummary(),
-          plaidApi.getTransactions(),
+          transactionsApi.list({ limit: 10 }),
+          plaidApi.getAccounts(),
         ]);
         
         setSummary(summaryData);
-        setTransactions(transactionsData.transactions);
+        setTransactions(transactionsData);
+        setAccounts(accountsData.accounts.map((a: any) => ({ id: a.id, name: a.name })));
       } catch (err: any) {
         if (err.response?.status === 401) {
           router.push('/login');
@@ -53,6 +56,11 @@ export default function DashboardPage() {
       day: 'numeric',
     });
   };
+
+  const accountsById: Record<number, { name: string }> = (accounts || []).reduce((acc: any, a) => {
+    acc[a.id] = { name: a.name };
+    return acc;
+  }, {});
 
   if (loading) {
     return (
@@ -285,14 +293,14 @@ export default function DashboardPage() {
                   Recent Transactions
                 </h3>
                 <div className="space-y-4">
-                  {transactions.slice(0, 10).map((transaction) => (
-                    <div key={transaction.transaction_id} className="flex justify-between items-center py-2 border-b last:border-b-0">
+                  {transactions.slice(0, 10).map((transaction: any) => (
+                    <div key={transaction.id} className="flex justify-between items-center py-2 border-b last:border-b-0">
                       <div>
                         <p className="font-medium text-gray-900">
                           {transaction.merchant_name || transaction.name}
                         </p>
-                        <p className="text-sm text-gray-500">
-                          {transaction.account_name} • {formatDate(transaction.date)}
+                        <p className="text-sm text-gray-900">
+                          {accountsById[transaction.account_id]?.name || 'Account'} • {formatDate(transaction.date)}
                         </p>
                       </div>
                       <div className="text-right">

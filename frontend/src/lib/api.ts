@@ -97,3 +97,34 @@ export const plaidApi = {
 
 export default api;
 
+// Transactions API
+export const transactionsApi = {
+  list: async (params: {
+    skip?: number;
+    limit?: number;
+    account_id?: number;
+    start_date?: string;
+    end_date?: string;
+    category?: string;
+    search?: string;
+  }) => {
+    const response: AxiosResponse<any[]> = await api.get('/api/transactions', { params });
+    return response.data;
+  },
+
+  detail: async (id: number) => {
+    const response: AxiosResponse<any> = await api.get(`/api/transactions/${id}`);
+    return response.data;
+  },
+
+  sync: async () => {
+    const response: AxiosResponse<{ message: string; created: number; updated: number }> = await api.post('/api/transactions/sync');
+    return response.data;
+  },
+
+  summary: async (period: 'day' | 'week' | 'month' | 'quarter' | 'year' = 'month') => {
+    const response: AxiosResponse<any> = await api.get('/api/transactions/summary', { params: { period } });
+    return response.data;
+  },
+};
+

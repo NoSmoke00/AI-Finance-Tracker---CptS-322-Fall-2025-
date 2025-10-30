@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 from app.database import get_db
 from app.models import User, PlaidItem, Account
 from app.auth.router import get_current_user_dependency
+from app.services.transaction_service import sync_transactions_for_user
 
 # Pydantic models
 class ExchangeTokenRequest(BaseModel):
@@ -113,7 +114,10 @@ async def exchange_public_token(
         # Fetch and store accounts
         await fetch_accounts(plaid_item.id, db)
 
-        return {"message": "Successfully linked bank account", "item_id": item_id}
+        # Sync transactions for this user
+        sync_result = sync_transactions_for_user(current_user.id, db)
+
+        return {"message": "Successfully linked bank account", "item_id": item_id, **sync_result}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
