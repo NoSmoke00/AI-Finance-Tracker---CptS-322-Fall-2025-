@@ -128,3 +128,27 @@ export const transactionsApi = {
   },
 };
 
+// Insights API
+export const insightsApi = {
+  list: async () => {
+    const response: AxiosResponse<any[]> = await api.get('/api/insights');
+    return response.data;
+  },
+  generate: async () => {
+    const response: AxiosResponse<any[]> = await api.post('/api/insights/generate');
+    return response.data;
+  },
+  dismiss: async (id: number) => {
+    const response: AxiosResponse<any> = await api.patch(`/api/insights/${id}/dismiss`);
+    return response.data;
+  },
+  view: async (id: number) => {
+    const response: AxiosResponse<any> = await api.patch(`/api/insights/${id}/view`);
+    return response.data;
+  },
+  remove: async (id: number) => {
+    const response: AxiosResponse<any> = await api.delete(`/api/insights/${id}`);
+    return response.data;
+  },
+};
+

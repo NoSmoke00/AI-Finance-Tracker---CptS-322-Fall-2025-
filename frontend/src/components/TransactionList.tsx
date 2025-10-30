@@ -8,6 +8,7 @@ interface Transaction {
   name: string;
   merchant_name?: string;
   primary_category?: string;
+  category?: string[];
   amount: number;
   pending?: boolean;
   account_id: number;
@@ -58,7 +59,10 @@ export default function TransactionList({ transactions, accountsById }: Props) {
                       ) : null}
                     </div>
                     <div className="text-sm text-gray-700">
-                      {accountsById[t.account_id]?.name || 'Account'} • {t.primary_category || 'Uncategorized'}
+                      {accountsById[t.account_id]?.name || 'Account'} • {(t.primary_category || (t.category && t.category[0]) || 'Uncategorized')}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Full: {t.category ? JSON.stringify(t.category) : '[]'}
                     </div>
                   </div>
                   <div className={`font-medium ${t.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>

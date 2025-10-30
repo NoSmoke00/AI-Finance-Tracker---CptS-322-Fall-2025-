@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import Sidebar from './Sidebar';
 
 interface AppLayoutProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {

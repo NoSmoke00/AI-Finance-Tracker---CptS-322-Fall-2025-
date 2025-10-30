@@ -63,6 +63,16 @@ export default function Sidebar() {
       available: false,
     },
     {
+      name: 'Insights',
+      href: '/insights',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2a7 7 0 00-7 7c0 2.577 1.5 4.8 3.667 5.846L9 18h6l.333-3.154C17.5 13.8 19 11.577 19 9a7 7 0 00-7-7zm-3 20h6" />
+        </svg>
+      ),
+      available: true,
+    },
+    {
       name: 'Goals',
       href: '/goals',
       icon: (

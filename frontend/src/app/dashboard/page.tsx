@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { dashboardApi, transactionsApi, plaidApi } from '@/lib/api';
 import { DashboardSummary, Account, Transaction } from '@/types';
 import AppLayout from '@/components/AppLayout';
+import InsightsSummary from '@/components/InsightsSummary';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function DashboardPage() {
         
         setSummary(summaryData);
         setTransactions(transactionsData);
-        setAccounts(accountsData.accounts.map((a: any) => ({ id: a.id, name: a.name })));
+        setAccounts(accountsData.accounts.map((a: { id: number; name: string }) => ({ id: a.id, name: a.name })));
       } catch (err: any) {
         if (err.response?.status === 401) {
           router.push('/login');
@@ -57,10 +58,13 @@ export default function DashboardPage() {
     });
   };
 
-  const accountsById: Record<number, { name: string }> = (accounts || []).reduce((acc: any, a) => {
-    acc[a.id] = { name: a.name };
-    return acc;
-  }, {});
+  const accountsById: Record<number, { name: string }> = (accounts || []).reduce(
+    (acc: Record<number, { name: string }>, a: { id: number; name: string }) => {
+      acc[a.id] = { name: a.name };
+      return acc;
+    },
+    {}
+  );
 
   if (loading) {
     return (
@@ -153,6 +157,10 @@ export default function DashboardPage() {
     <AppLayout>
       <div className="flex-1 overflow-auto">
         <main className="p-6">
+          {/* Insights Summary */}
+          <div className="mb-6">
+            <InsightsSummary />
+          </div>
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-white overflow-hidden shadow rounded-lg">
@@ -252,7 +260,7 @@ export default function DashboardPage() {
                   Accounts ({summary?.summary.total_accounts || 0})
                 </h3>
                 <div className="space-y-4">
-                  {summary?.accounts.map((account) => (
+                  {summary?.accounts.map((account: Account) => (
                     <div key={account.id} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start">
                         <div>
