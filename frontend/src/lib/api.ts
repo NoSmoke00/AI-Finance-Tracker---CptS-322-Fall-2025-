@@ -10,6 +10,9 @@ import {
   Transaction,
   PlaidLinkTokenResponse,
   PlaidExchangeResponse,
+  Budget,
+  BudgetWithStatus,
+  BudgetPeriod,
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -149,6 +152,48 @@ export const insightsApi = {
   remove: async (id: number) => {
     const response: AxiosResponse<any> = await api.delete(`/api/insights/${id}`);
     return response.data;
+  },
+};
+
+// Budgets API
+export const budgetsApi = {
+  list: async (activeOnly: boolean = true): Promise<Budget[]> => {
+    const response: AxiosResponse<Budget[]> = await api.get('/api/budgets', { params: { active_only: activeOnly } });
+    return response.data;
+  },
+
+  getStatus: async (): Promise<BudgetWithStatus[]> => {
+    const response: AxiosResponse<BudgetWithStatus[]> = await api.get('/api/budgets/status');
+    return response.data;
+  },
+
+  getBudgetStatus: async (budget_id: number): Promise<BudgetWithStatus> => {
+    const response: AxiosResponse<BudgetWithStatus> = await api.get(`/api/budgets/${budget_id}/status`);
+    return response.data;
+  },
+
+  create: async (data: {
+    category: string;
+    amount: number;
+    period: BudgetPeriod;
+    alert_threshold?: number;
+  }): Promise<Budget> => {
+    const response: AxiosResponse<Budget> = await api.post('/api/budgets', data);
+    return response.data;
+  },
+
+  update: async (budget_id: number, data: {
+    amount?: number;
+    period?: BudgetPeriod;
+    is_active?: boolean;
+    alert_threshold?: number;
+  }): Promise<Budget> => {
+    const response: AxiosResponse<Budget> = await api.patch(`/api/budgets/${budget_id}`, data);
+    return response.data;
+  },
+
+  delete: async (budget_id: number): Promise<void> => {
+    await api.delete(`/api/budgets/${budget_id}`);
   },
 };
 

@@ -83,13 +83,22 @@ def sync_transactions_for_user(user_id: int, db: Session) -> Dict[str, int]:
                 # Plaid: positive is expense; store expenses as negative
                 amount_to_store = -amount
 
-                # Use Plaid Personal Finance Category when present (simple handling)
+                # Use Plaid Personal Finance Category when present (supports dict and SDK objects)
                 pfc = tr.get('personal_finance_category')
                 primary_category = None
                 categories = tr.get('category')
-                if isinstance(pfc, dict):
-                    primary_category = pfc.get('primary') or None
-                    detailed = pfc.get('detailed') or None
+                if pfc is not None:
+                    try:
+                        primary_val = pfc.get('primary') if hasattr(pfc, 'get') else getattr(pfc, 'primary', None)
+                    except Exception:
+                        primary_val = getattr(pfc, 'primary', None)
+                    try:
+                        detailed_val = pfc.get('detailed') if hasattr(pfc, 'get') else getattr(pfc, 'detailed', None)
+                    except Exception:
+                        detailed_val = getattr(pfc, 'detailed', None)
+
+                    primary_category = primary_val or None
+                    detailed = detailed_val or None
                     categories = [c for c in [primary_category, detailed] if c]
 
                 # Coerce categories to clean list[str]

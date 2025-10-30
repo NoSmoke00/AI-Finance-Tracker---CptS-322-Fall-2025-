@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey, Numeric, Date
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey, Numeric, Date, Enum
+import enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -20,6 +21,7 @@ class User(Base):
     # Relationships
     plaid_items = relationship("PlaidItem", back_populates="user")
     accounts = relationship("Account", back_populates="user")
+    budgets = relationship("Budget", back_populates="user")
 
 class PlaidItem(Base):
     __tablename__ = "plaid_items"
@@ -105,3 +107,24 @@ class Insight(Base):
 
     user = relationship("User")
 
+
+class BudgetPeriod(enum.Enum):
+    MONTHLY = "monthly"
+    WEEKLY = "weekly"
+    YEARLY = "yearly"
+
+
+class Budget(Base):
+    __tablename__ = "budgets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    category = Column(String, nullable=False)  # e.g., "FOOD_AND_DRINK", "TRAVEL", etc.
+    amount = Column(Numeric(15, 2), nullable=False)
+    period = Column(String(20), nullable=False, default="monthly")
+    is_active = Column(Boolean, default=True)
+    alert_threshold = Column(Numeric(5, 2), default=80.0)  # Alert when spending reaches % of budget
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    user = relationship("User", back_populates="budgets")
