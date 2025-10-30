@@ -21,10 +21,19 @@ export default function InsightsSummary() {
     load();
   }, []);
 
-  if (loading) return null;
+  if (loading) return (
+    <div className="text-center py-4">
+      <p className="text-gray-600">Loading insights...</p>
+    </div>
+  );
+  
   if (!insights.length) return (
-    <div className="bg-white shadow rounded-lg p-4">
-      <div className="text-gray-700">No new insights. Check back after more transactions.</div>
+    <div className="text-center py-8">
+      <p className="text-gray-600 mb-2">No new insights</p>
+      <p className="text-sm text-gray-500">Generate insights to get personalized financial recommendations</p>
+      <a href="/insights" className="mt-4 inline-block text-sm text-blue-600 hover:text-blue-800 font-medium">
+        Generate Insights →
+      </a>
     </div>
   );
 

@@ -157,10 +157,6 @@ export default function DashboardPage() {
     <AppLayout>
       <div className="flex-1 overflow-auto">
         <main className="p-6">
-          {/* Insights Summary */}
-          <div className="mb-6">
-            <InsightsSummary />
-          </div>
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-white overflow-hidden shadow rounded-lg">
@@ -252,50 +248,9 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Accounts */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                  Accounts ({summary?.summary.total_accounts || 0})
-                </h3>
-                <div className="space-y-4">
-                  {summary?.accounts.map((account: Account) => (
-                    <div key={account.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-medium text-gray-900">{account.name}</h4>
-                          <p className="text-sm text-gray-500">
-                            {account.institution_name} • {account.subtype} • ****{account.mask}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium text-gray-900">
-                            {formatCurrency(account.balance_current)}
-                          </p>
-                          {account.balance_available !== account.balance_current && (
-                            <p className="text-sm text-gray-500">
-                              Available: {formatCurrency(account.balance_available)}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {(!summary?.accounts || summary.accounts.length === 0) && (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500 mb-4">No accounts linked yet</p>
-                      <a href="/accounts" className="btn btn-primary">
-                        Link Bank Account
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Transactions */}
-            <div className="bg-white shadow rounded-lg">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Transactions - 2 columns */}
+            <div className="lg:col-span-2 bg-white shadow rounded-lg">
               <div className="px-4 py-5 sm:p-6">
                 <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
                   Recent Transactions
@@ -328,9 +283,68 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+
+            {/* Right Column - AI Insights & Accounts */}
+            <div className="space-y-6">
+              {/* AI Insights */}
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg leading-6 font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+                      AI Insights
+                    </h3>
+                    <a href="/insights" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                      View All →
+                    </a>
+                  </div>
+                  <InsightsSummary />
+                </div>
+              </div>
+
+              {/* Accounts - 1 column */}
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                      Accounts ({summary?.summary.total_accounts || 0})
+                    </h3>
+                    <a href="/accounts" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                      View All →
+                    </a>
+                  </div>
+                  <div className="space-y-3">
+                    {summary?.accounts.slice(0, 4).map((account: Account) => (
+                      <div key={account.id} className="border rounded-lg p-3">
+                        <div className="flex justify-between items-start">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-medium text-gray-900 truncate">{account.name}</h4>
+                            <p className="text-xs text-gray-500 truncate">
+                              {account.institution_name} • {account.subtype}
+                            </p>
+                          </div>
+                          <div className="text-right ml-2 flex-shrink-0">
+                            <p className="font-medium text-gray-900 text-sm">
+                              {formatCurrency(account.balance_current)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {(!summary?.accounts || summary.accounts.length === 0) && (
+                      <div className="text-center py-4">
+                        <p className="text-sm text-gray-500 mb-2">No accounts linked yet</p>
+                        <a href="/accounts" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                          Link Account →
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
       </div>
     </AppLayout>
   );
-  }
+}

@@ -83,3 +83,25 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+export type BudgetPeriod = 'monthly' | 'weekly' | 'yearly';
+
+export interface Budget {
+  id: number;
+  user_id: number;
+  category: string;
+  amount: number;
+  period: BudgetPeriod;
+  is_active: boolean;
+  alert_threshold: number;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface BudgetWithStatus extends Budget {
+  spent: number;
+  remaining: number;
+  percentage_used: number;
+  is_over_budget: boolean;
+  is_near_threshold: boolean;
+}
+

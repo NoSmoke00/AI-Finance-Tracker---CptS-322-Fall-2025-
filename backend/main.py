@@ -12,6 +12,7 @@ from app.api.dashboard import router as dashboard_router
 from app.api.plaid_routes import router as plaid_router
 from app.api.transactions import router as transactions_router
 from app.api.insights import router as insights_router
+from app.api.budgets import router as budgets_router
 from app.tasks.insight_tasks import start_scheduler
 import os
 
@@ -46,6 +47,7 @@ app.include_router(dashboard_router, prefix="/api/dashboard", tags=["dashboard"]
 app.include_router(plaid_router, prefix="/api/plaid", tags=["plaid"])
 app.include_router(transactions_router, prefix="/api/transactions", tags=["transactions"])
 app.include_router(insights_router, prefix="/api/insights", tags=["insights"])
+app.include_router(budgets_router, prefix="/api/budgets", tags=["budgets"])
 
 @app.get("/")
 async def root():
